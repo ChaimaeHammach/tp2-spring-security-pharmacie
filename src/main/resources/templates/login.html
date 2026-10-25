@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Connexion')}"></head>
+<body>
+<main class="login-page px-3">
+    <div class="card shadow-sm login-card">
+        <div class="card-body p-4">
+            <h1 class="h4 text-center mb-1">✚ Pharmacie</h1>
+            <p class="text-center text-muted small mb-4">Connectez-vous pour continuer</p>
+
+            <!-- ?error et ?logout sont ajoutés par Spring Security (voir SecurityConfig) -->
+            <div th:if="${param.error}" class="alert alert-danger py-2 small">
+                Nom d'utilisateur ou mot de passe incorrect (ou compte désactivé).
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success py-2 small">
+                Vous êtes déconnecté.
+            </div>
+
+            <!-- Les champs DOIVENT s'appeler "username" et "password" : c'est ce que Spring Security attend -->
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-vert w-100">Se connecter</button>
+            </form>
+
+            <details class="mt-4 small text-muted">
+                <summary>Comptes de test</summary>
+                <table class="table table-sm mt-2 mb-0">
+                    <tr><td>admin</td><td>admin123</td><td>ADMIN</td></tr>
+                    <tr><td>pharma</td><td>pharma123</td><td>PHARMACIEN</td></tr>
+                    <tr><td>caisse</td><td>caisse123</td><td>CAISSIER</td></tr>
+                    <tr><td>client</td><td>client123</td><td>CLIENT</td></tr>
+                </table>
+            </details>
+        </div>
+    </div>
+</main>
+</body>
+</html>

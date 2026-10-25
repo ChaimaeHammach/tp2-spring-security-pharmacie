@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ventes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('ventes')}"></nav>
+<div th:replace="~{fragments/layout :: messages}"></div>
+
+<main class="container">
+    <div class="d-flex flex-wrap align-items-baseline gap-3 mb-3">
+        <h1 class="h3 mb-0 me-auto">Ventes</h1>
+        <span class="text-muted">Chiffre d'affaires du jour :
+            <strong class="prix" th:text="${#numbers.formatDecimal(caJour, 1, 'WHITESPACE', 2, 'COMMA')} + ' DH'">0 DH</strong>
+        </span>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h6 mb-3">Nouvelle vente</h2>
+            <div th:if="${#lists.isEmpty(medicaments)}" class="text-muted">Aucun médicament en stock.</div>
+            <form th:unless="${#lists.isEmpty(medicaments)}" th:action="@{/ventes}" method="post" class="row g-2 align-items-end">
+                <div class="col-md-7">
+                    <label class="form-label small">Médicament</label>
+                    <select name="medicamentId" class="form-select" required>
+                        <option th:each="m : ${medicaments}" th:value="${m.id}"
+                                th:text="${m.nom} + ' — ' + ${#numbers.formatDecimal(m.prix, 1, 'WHITESPACE', 2, 'COMMA')} + ' DH (stock : ' + ${m.quantiteStock} + ')'">med</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">Quantité</label>
+                    <input type="number" name="quantite" value="1" min="1" class="form-control" required>
+                </div>
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-vert w-100">Enregistrer la vente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h2 class="h5">Historique</h2>
+    <div th:if="${#lists.isEmpty(ventes)}" class="alert alert-light border">Aucune vente pour le moment.</div>
+    <div class="card shadow-sm table-responsive" th:unless="${#lists.isEmpty(ventes)}">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+            <tr><th>Date</th><th>Médicament</th><th class="text-end">Qté</th><th class="text-end">Prix unit.</th>
+                <th class="text-end">Total</th><th>Vendeur</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="v : ${ventes}">
+                <td class="text-nowrap" th:text="${#temporals.format(v.dateVente, 'dd/MM/yyyy HH:mm')}">date</td>
+                <td th:text="${v.medicament.nom}">med</td>
+                <td class="text-end" th:text="${v.quantite}">1</td>
+                <td class="text-end prix" th:text="${#numbers.formatDecimal(v.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                <td class="text-end prix fw-semibold" th:text="${#numbers.formatDecimal(v.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')} + ' DH'">0</td>
+                <td th:text="${v.vendeur.username}">user</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

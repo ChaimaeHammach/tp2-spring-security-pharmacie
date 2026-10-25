@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${medicament.id == null ? 'Nouveau médicament' : 'Modifier médicament'})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('medicaments')}"></nav>
+
+<main class="container" style="max-width: 720px">
+    <a th:href="@{/medicaments}" class="small">← Retour</a>
+    <h1 class="h3 mt-2 mb-3" th:text="${medicament.id == null} ? 'Nouveau médicament' : 'Modifier ' + ${medicament.nom}">Médicament</h1>
+
+    <!-- th:object + th:field : lie le formulaire à l'objet "medicament" ; th:errors affiche les erreurs de @Valid -->
+    <form th:action="@{/medicaments/enregistrer}" th:object="${medicament}" method="post" class="card shadow-sm">
+        <div class="card-body row g-3">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="col-md-8">
+                <label class="form-label">Nom *</label>
+                <input type="text" th:field="*{nom}" class="form-control" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{nom}">erreur</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Catégorie</label>
+                <input type="text" th:field="*{categorie}" class="form-control">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea th:field="*{description}" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Prix (DH) *</label>
+                <input type="number" step="0.01" min="0" th:field="*{prix}" class="form-control" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{prix}">erreur</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Quantité en stock *</label>
+                <input type="number" min="0" th:field="*{quantiteStock}" class="form-control" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{quantiteStock}">erreur</div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date d'expiration</label>
+                <input type="date" th:field="*{dateExpiration}" class="form-control">
+            </div>
+        </div>
+        <div class="card-footer bg-white text-end">
+            <a th:href="@{/medicaments}" class="btn btn-outline-secondary">Annuler</a>
+            <button type="submit" class="btn btn-vert">Enregistrer</button>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

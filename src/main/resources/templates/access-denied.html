@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Accès refusé')}"></head>
+<body>
+<main class="container text-center py-5" style="max-width: 560px">
+    <div class="display-4 mb-2">🔒</div>
+    <h1 class="h3">403 — Accès refusé</h1>
+    <p class="text-muted">
+        <span sec:authorize="isAuthenticated()">
+            Vous êtes connecté en tant que <strong sec:authentication="name">user</strong>
+            (<span sec:authentication="principal.authorities">ROLE</span>),
+            mais ce rôle n'a pas le droit d'accéder à cette page.
+        </span>
+    </p>
+    <a th:href="@{/home}" class="btn btn-vert">Retour à l'accueil</a>
+</main>
+</body>
+</html>

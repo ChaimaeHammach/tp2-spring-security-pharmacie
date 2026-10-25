@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Administration')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('admin')}"></nav>
+<div th:replace="~{fragments/layout :: messages}"></div>
+
+<main class="container">
+    <h1 class="h3 mb-3">Administration</h1>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body">
+            <div class="small text-muted">Utilisateurs</div>
+            <div class="fs-3 fw-semibold" th:text="${#lists.size(users)}">0</div>
+        </div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body">
+            <div class="small text-muted">Médicaments</div>
+            <div class="fs-3 fw-semibold" th:text="${nbMedicaments}">0</div>
+        </div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body">
+            <div class="small text-muted">Ventes</div>
+            <div class="fs-3 fw-semibold" th:text="${nbVentes}">0</div>
+        </div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body">
+            <div class="small text-muted">CA du jour</div>
+            <div class="fs-3 fw-semibold prix" th:text="${#numbers.formatDecimal(caJour, 1, 'WHITESPACE', 2, 'COMMA')} + ' DH'">0</div>
+        </div></div></div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Liste des utilisateurs -->
+        <div class="col-lg-8">
+            <h2 class="h5">Utilisateurs</h2>
+            <div class="card shadow-sm table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>Utilisateur</th><th>Rôles</th><th>État</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td class="fw-semibold" th:text="${u.username}">user</td>
+                        <td><span th:each="r : ${u.roles}" class="badge badge-role me-1" th:text="${r.name}">ROLE</span></td>
+                        <td>
+                            <span th:if="${u.enabled}" class="badge text-bg-success">Actif</span>
+                            <span th:unless="${u.enabled}" class="badge text-bg-secondary">Désactivé</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <!-- Pas d'action sur son propre compte -->
+                            <th:block th:unless="${#authentication.name == u.username}">
+                                <form th:action="@{/admin/users/{id}/activation(id=${u.id})}" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-outline-secondary" th:text="${u.enabled} ? 'Désactiver' : 'Activer'">Désactiver</button>
+                                </form>
+                                <form th:action="@{/admin/users/{id}/supprimer(id=${u.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </form>
+                            </th:block>
+                            <span th:if="${#authentication.name == u.username}" class="small text-muted">(vous)</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Formulaire de création -->
+        <div class="col-lg-4">
+            <h2 class="h5">Nouvel utilisateur</h2>
+            <form th:action="@{/admin/users}" th:object="${userForm}" method="post" class="card shadow-sm">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        <input type="text" th:field="*{username}" class="form-control" required minlength="3">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" th:field="*{password}" class="form-control" required minlength="6">
+                        <div class="form-text">Il sera chiffré avec BCrypt avant l'enregistrement.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Rôles</label>
+                        <div class="form-check" th:each="r : ${roles}">
+                            <input type="checkbox" class="form-check-input" th:field="*{roleIds}" th:value="${r.id}">
+                            <label class="form-check-label" th:for="${#ids.prev('roleIds')}" th:text="${r.name}">ROLE</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-vert w-100">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

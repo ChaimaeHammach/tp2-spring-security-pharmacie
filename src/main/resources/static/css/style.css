@@ -1,0 +1,14 @@
+:root { --vert: #0f7b5f; --vert-fonce: #0b5c47; --vert-clair: #e6f4ef; }
+body { background: #f6f8f7; }
+.navbar { background: var(--vert); }
+.navbar .nav-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 6px; }
+.btn-vert { background: var(--vert); color: #fff; }
+.btn-vert:hover { background: var(--vert-fonce); color: #fff; }
+.carte-role { border: none; border-top: 4px solid var(--vert); transition: transform .15s; }
+a:hover > .carte-role { transform: translateY(-2px); }
+.table thead th { background: var(--vert-clair); }
+.badge-role { background: var(--vert-clair); color: var(--vert); border: 1px solid #b9e0d2; font-weight: 500; }
+.prix { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-card { width: 100%; max-width: 400px; }
+.stock-input { width: 90px; }

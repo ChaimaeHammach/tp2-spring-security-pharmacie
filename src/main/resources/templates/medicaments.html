@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Médicaments')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar('medicaments')}"></nav>
+<div th:replace="~{fragments/layout :: messages}"></div>
+
+<main class="container">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0 me-auto">
+            <span sec:authorize="hasRole('CLIENT') and !hasAnyRole('ADMIN','PHARMACIEN')">Médicaments disponibles</span>
+            <span sec:authorize="hasAnyRole('ADMIN','PHARMACIEN')">Médicaments &amp; stocks</span>
+        </h1>
+        <form th:action="@{/medicaments}" method="get" class="d-flex gap-2">
+            <input type="search" name="q" th:value="${q}" class="form-control form-control-sm" placeholder="Rechercher…">
+            <button class="btn btn-sm btn-outline-secondary">OK</button>
+        </form>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/medicaments/nouveau}" class="btn btn-sm btn-vert">+ Nouveau</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(medicaments)}" class="alert alert-info">Aucun médicament trouvé.</div>
+
+    <div class="card shadow-sm table-responsive" th:unless="${#lists.isEmpty(medicaments)}">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th class="text-end">Prix</th>
+                <th>Expiration</th>
+                <th class="text-end">Stock</th>
+                <th sec:authorize="hasAnyRole('ADMIN','PHARMACIEN')">Modifier le stock</th>
+                <th sec:authorize="hasRole('ADMIN')" class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${medicaments}">
+                <td>
+                    <div class="fw-semibold" th:text="${m.nom}">nom</div>
+                    <div class="small text-muted" th:text="${m.description}">desc</div>
+                </td>
+                <td th:text="${m.categorie}">cat</td>
+                <td class="text-end prix" th:text="${#numbers.formatDecimal(m.prix, 1, 'WHITESPACE', 2, 'COMMA')} + ' DH'">0 DH</td>
+                <td>
+                    <span th:text="${m.dateExpiration != null} ? ${#temporals.format(m.dateExpiration, 'dd/MM/yyyy')} : '-'">date</span>
+                    <span th:if="${m.expire}" class="badge text-bg-danger">Expiré</span>
+                </td>
+                <td class="text-end">
+                    <span th:text="${m.quantiteStock}">0</span>
+                    <span th:if="${m.quantiteStock == 0}" class="badge text-bg-secondary">Rupture</span>
+                    <span th:if="${m.stockFaible}" class="badge text-bg-warning">Faible</span>
+                </td>
+
+                <!-- ADMIN + PHARMACIEN : formulaire de stock -->
+                <td sec:authorize="hasAnyRole('ADMIN','PHARMACIEN')">
+                    <form th:action="@{/medicaments/{id}/stock(id=${m.id})}" method="post" class="d-flex gap-1">
+                        <input type="number" name="quantite" min="0" th:value="${m.quantiteStock}"
+                               class="form-control form-control-sm stock-input" required>
+                        <button class="btn btn-sm btn-outline-success">OK</button>
+                    </form>
+                </td>
+
+                <!-- ADMIN seulement : modifier / supprimer -->
+                <td sec:authorize="hasRole('ADMIN')" class="text-end text-nowrap">
+                    <a th:href="@{/medicaments/{id}/modifier(id=${m.id})}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                    <form th:action="@{/medicaments/{id}/supprimer(id=${m.id})}" method="post" class="d-inline"
+                          onsubmit="return confirm('Supprimer ce médicament ?');">
+                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
